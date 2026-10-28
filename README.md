@@ -1,63 +1,70 @@
-# 🏋️‍♂️ Sistema de Gestión Integral para Club Deportivo (CLUB67)
-> **Análisis Funcional, Modelado de Software UML y Arquitectura en 3 Capas (.NET C# & MySQL)**  
-> **Autora:** Sabrina Belén Mamaniz  
-> **Especialidad:** Analista Funcional / Modelado de Sistemas / Data & Software  
+# Sistema de Gestión para Club Deportivo (CLUB67)
+> Trabajo Integrador de Modelado de Software y Arquitectura en 3 Capas (.NET C# y MySQL)  
+> Desarrollado por **Sabrina Belén Mamaniz** para la Tecnicatura Superior en Desarrollo de Software (IFTS N° 29, CABA).
 
-[![Tecnología](https://img.shields.io/badge/Tecnolog%C3%ADa-.NET%20%7C%20C%23-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
-[![Base de Datos](https://img.shields.io/badge/Base%20de%20Datos-MySQL%208.0-orange?style=flat-square&logo=mysql)](https://www.mysql.com/)
-[![Arquitectura](https://img.shields.io/badge/Arquitectura-3%20Capas%20%7C%20Singleton%20%7C%20Repository-success?style=flat-square)](#)
-[![Estándar](https://img.shields.io/badge/Modelado-UML%202.0%20%7C%20IEEE%20830-purple?style=flat-square)](#)
-
----
-
-## 📌 1. Descripción del Proyecto y Caso de Negocio
-
-Este proyecto documenta y estructura el **análisis funcional, relevamiento de procesos y diseño de software** para la informatización de un **Club Deportivo y Gimnasio**. 
-
-El sistema resuelve la problemática clásica de las instituciones deportivas: descontrol en los pagos recurrentes, falta de seguimiento en los vencimientos diarios, falta de trazabilidad en los aptos físicos de los socios y desorden en el cobro de actividades para usuarios no asociados.
-
-### 🎯 Objetivos de Negocio Alcanzados:
-* **Control estricto de cobranzas y membresías:** Diferenciación operativa entre **Socios** (cuota mensual recurrente con cálculo de 30 días acumulativos) y **No Socios** (pases eventuales por jornada y actividad).
-* **Cumplimiento normativo y salud:** Obligatoriedad de certificado médico de **Apto Físico** como validación bloqueante para el alta de cualquier usuario, integrado al módulo de **Ficha Médica y Nutrición** con escala de carga física de esfuerzo permitida (1 a 5).
-* **Control de acceso e inhabilitación por mora:** Bloqueo automatizado de acceso al club al cumplirse la fecha límite de pago, habilitando la reactivación inmediata una vez regularizada la cuota.
-* **Trazabilidad operativa:** Fichaje horario de asistencia para el plantel docente y control de cupos por disciplina deportiva (Crossfit, Spinning, Musculación, Natación).
+[![Tecnología](https://img.shields.io/badge/.NET-C%23-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
+[![Base de Datos](https://img.shields.io/badge/MySQL-8.0-orange?style=flat-square&logo=mysql)](https://www.mysql.com/)
+[![Patrones](https://img.shields.io/badge/Arquitectura-3%20Capas%20%7C%20Singleton%20%7C%20Repository-success?style=flat-square)](#)
+[![Modelado](https://img.shields.io/badge/UML-Casos%20de%20Uso%20%7C%20Clases%20%7C%20Secuencia-purple?style=flat-square)](#)
 
 ---
 
-## 🏗️ 2. Arquitectura de Software
+## Origen y Contexto del Proyecto
 
-La solución fue diseñada siguiendo una **Arquitectura en 3 Capas desacopladas**, implementando patrones de diseño reconocidos en la industria:
+Desarrollé este proyecto como Trabajo Práctico Integrador para las materias **Modelado y Diseño de Software** y **Taller de Programación** del IFTS N° 29. 
 
-* **Capa de Presentación (UI):** Interfaces construidas en WinForms con validaciones en tiempo real (`ErrorProvider`) y navegación fluida orientada a la experiencia de usuario (`UX/UI`).
-* **Capa de Negocio (BLL):** Clases del dominio con lógica de negocio encapsulada. Implementación de **Singleton** en la clase administradora `Club` para centralizar la sesión y cachés maestras, y **Herencia / Polimorfismo** en las jerarquías de `Cliente` y `Pago`.
-* **Capa de Datos (DAL):** Implementación del **Patrón Repository** y clase de conexión `Conectividad.cs`, ejecutando consultas parametrizadas contra **MySQL Server** para blindar el sistema contra inyecciones SQL.
+El objetivo era modelar e implementar el circuito operativo de un club deportivo barrial: administración de socios, cobro de aranceles, control de accesos por cuota al día, turnos de nutrición y registro del personal docente. 
+
+En vez de limitarme a una interfaz visual simple, encaré el proyecto desde la ingeniería de software: primero relevé los procesos y reglas del negocio, después modelé la solución con diagramas UML formales y finalmente construí la arquitectura en capas conectada a MySQL.
 
 ---
 
-## 📐 3. Diagramas de Modelado y Diseño (UML)
+## Decisiones de Negocio y Reglas que Implementé
 
-### 3.1 Diagrama de Casos de Uso del Sistema
-Representa los límites del sistema, los actores y las relaciones de inclusión (`<<include>>`) y extensión condicional (`<<extend>>`):
+Cuando analicé el funcionamiento del club, identifiqué cinco reglas clave que debían reflejarse en el sistema:
+
+1. **Diferenciación entre Socios y No Socios:** Los socios pagan una cuota mensual recurrente que les permite acceder a las instalaciones. Los no socios solo abonan un pase diario para la actividad puntual que eligen en el día.
+2. **Cálculo de vencimientos a 30 días continuos:** Si un socio se atrasa y paga fuera de término, los 30 días no se cuentan desde el día del pago, sino a partir de la fecha de su vencimiento anterior. De esta manera, el club evita que un socio saltee períodos impagos.
+3. **Apto físico obligatorio:** Ningún cliente puede completar su registro ni participar en actividades sin presentar el certificado médico. En el sistema, la validación del apto bloquea el guardado si no está tildada la recepción del documento.
+4. **Carnet exclusivo para socios al día:** El carnet con identificador único solo se genera para socios con cuota vigente. Si el socio queda inhabilitado por mora, el sistema impide la emisión de duplicados hasta regularizar el pago.
+5. **Financiación con tarjeta:** El cobro en 3 o 6 cuotas se restringe únicamente al medio de pago tarjeta de crédito.
+
+---
+
+## Arquitectura del Software
+
+Organicé el código en tres capas separadas para que cada componente tenga una única responsabilidad:
+
+* **Capa de Presentación (UI):** Formularios de escritorio en WinForms (C#) con validaciones en tiempo real para evitar campos vacíos o formatos inválidos.
+* **Capa de Negocio (BLL):** Clases del dominio con las reglas del club. Utilicé el patrón creacional **Singleton** en la clase `Club` para mantener una única instancia administradora en memoria con las listas maestras, y apliqué herencia tanto en clientes (`Cliente` -> `Socio` / `NoSocio`) como en pagos (`Pago` -> `PagoMensual` / `PagoActividad`).
+* **Capa de Datos (DAL):** Apliqué el patrón **Repository** mediante clases específicas de acceso a datos (`ClienteDatos.cs`, `PagoDatos.cs`, etc.) y una clase central `Conectividad.cs`. Todas las consultas contra MySQL utilizan parámetros para evitar inyecciones SQL.
+
+---
+
+## Diagramas del Sistema (UML)
+
+### Casos de Uso
+El siguiente diagrama resume los límites del sistema, los actores que intervienen y las relaciones entre operaciones:
 
 ```mermaid
 flowchart LR
     subgraph Actores
-        Admin["👤 Administrativo<br/>(Actor Primario)"]
-        Socio["👤 Socio"]
-        NoSocio["👤 No Socio"]
-        Prof["👤 Profesor"]
-        Med["👤 Médico / Nutricionista"]
+        Admin["Administrativo<br/>(Actor Principal)"]
+        Socio["Socio"]
+        NoSocio["No Socio"]
+        Prof["Profesor"]
+        Med["Médico / Nutricionista"]
     end
 
-    subgraph Sistema ["Sistema de Gestión — Club Deportivo"]
-        CU01(["CU-01: Inscripción al Club"])
-        CU02(["CU-02: Registrar Pago Mensual"])
-        CU03(["CU-03: Emitir Carnet"])
-        CU04(["CU-04: Seleccionar Actividad"])
-        CU05(["CU-05: Registrar Pago Actividad"])
-        CU06(["CU-06: Consultar Vencimientos"])
-        CU07(["CU-07: Actualizar Ficha Médica"])
-        CU08(["CU-08: Registrar Asistencia Docente"])
+    subgraph Sistema ["Sistema de Gestión Club Deportivo"]
+        CU01(["Inscripción al Club"])
+        CU02(["Registrar Pago Mensual"])
+        CU03(["Emitir Carnet"])
+        CU04(["Seleccionar Actividad"])
+        CU05(["Registrar Pago Actividad"])
+        CU06(["Consultar Vencimientos"])
+        CU07(["Actualizar Ficha Médica"])
+        CU08(["Registrar Asistencia Docente"])
     end
 
     Admin --> CU01
@@ -77,8 +84,8 @@ flowchart LR
 
 ---
 
-### 3.2 Diagrama de Clases (Estructura Estática del Dominio)
-Estructura orientada a objetos con tipos de datos, visibilidad, relaciones de asociación, composición y herencia:
+### Diagrama de Clases del Dominio
+Muestra la jerarquía de herencia, métodos y multiplicidades del sistema:
 
 ```mermaid
 classDiagram
@@ -203,42 +210,42 @@ classDiagram
 
 ---
 
-### 3.3 Diagrama de Flujo y Actividades: Proceso de Inscripción
-Muestra la interacción y delegación de responsabilidades mediante marcos (*swimlanes*):
+### Flujo de Actividades: Inscripción al Club
+Proceso dividido en carriles para delimitar responsabilidades entre el cliente, el administrativo y el sistema:
 
 ```mermaid
 flowchart TD
     subgraph Cliente
-        A1([Inicio]) --> A2[Presenta DNI y Apto Físico]
+        A1([Inicio]) --> A2[Presenta DNI y certificado médico]
     end
 
     subgraph Administrativo
         A2 --> B1[Abre formulario de registro]
-        B1 --> B2[Ingresa DNI y datos de contacto]
-        B4{¿DNI Duplicado?} -- Sí --> B5[Informa error y solicita corrección]
+        B1 --> B2[Ingresa datos personales y de contacto]
+        B4{¿DNI ya registrado?} -- Sí --> B5[Informa error y solicita verificar datos]
         B5 --> B2
-        B4 -- No --> B6{¿Tipo de Cliente?}
-        B6 -- Socio --> B7[Cobra cuota de inscripción]
-        B6 -- No Socio --> B8[Registra perfil eventual]
+        B4 -- No --> B6{¿Tipo de cliente?}
+        B6 -- Socio --> B7[Registra cobro de primera mensualidad]
+        B6 -- No Socio --> B8[Registra cliente eventual]
         B7 --> B9[Entrega carnet impreso]
-        B9 --> B10([Fin de Registro])
+        B9 --> B10([Fin del trámite])
         B8 --> B10
     end
 
     subgraph Sistema
-        B2 --> C1[Verifica unicidad en Base de Datos]
+        B2 --> C1[Consulta tabla clientes en MySQL]
         C1 --> B4
-        B7 --> C2[Guarda Pago y calcula Vencimiento +30 días]
-        C2 --> C3[Genera carnet digital y código alfanumérico]
+        B7 --> C2[Inserta pago y calcula vencimiento a 30 días]
+        C2 --> C3[Genera número de carnet único]
         C3 --> B9
     end
 ```
 
 ---
 
-## 🗄️ 4. Modelo de Datos Relacional (MySQL)
+## Base de Datos (MySQL)
 
-El modelo fue normalizado hasta **Tercera Forma Normal (3FN)** para asegurar integridad referencial y evitar anomalías de inserción, borrado y modificación:
+Diseñé la estructura relacional normalizada en 3FN con claves foráneas e índices en DNI y fechas de vencimiento:
 
 ```mermaid
 erDiagram
@@ -331,64 +338,48 @@ erDiagram
     }
 ```
 
-El script SQL completo y ejecutable con constraints y seed data se encuentra disponible en:  
-👉 [`database/schema.sql`](database/schema.sql)
+El script SQL completo para recrear las tablas y cargar datos de prueba está en [`database/schema.sql`](database/schema.sql).
 
 ---
 
-## 📋 5. Reglas de Negocio Implementadas
-
-| Regla de Negocio | Definición Funcional e Implementación Técnica |
-| :--- | :--- |
-| **RN-01: Apto Físico Excluyente** | Ningún cliente puede completar la inscripción ni realizar actividades sin tildar la presentación de su certificado médico legal. |
-| **RN-02: Cálculo de Vencimiento de Cuota** | El ciclo de facturación es de 30 días continuos. Si un socio moroso abona fuera de término, los 30 días se computan a partir de la fecha de su vencimiento anterior para evitar salteo de períodos. |
-| **RN-03: Emisión de Carnet Exclusivo** | El carnet solo se emite a miembros registrados como `Socio` que posean su cuota en estado `Vigente = true`. Los `No Socios` operan con tickets diarios. |
-| **RN-04: Restricciones de Financiación** | La opción de cobro en 3 o 6 cuotas se habilita únicamente cuando el medio de pago seleccionado es `Tarjeta de Crédito`. |
-| **RN-05: Control de Carga Física Nutricional** | La escala de esfuerzo físico en la ficha médica está estrictamente restringida por restricción `CHECK` entre los valores enteros 1 a 5. |
-
----
-
-## 📂 6. Estructura del Repositorio
+## Estructura de la Documentación
 
 ```text
 ├── database/
-│   └── schema.sql                    # Script DDL/DML de creación de base de datos MySQL y Seed Data
+│   └── schema.sql                    # Script DDL/DML de creación de tablas y datos iniciales en MySQL
 ├── docs/
-│   ├── especificacion_casos_de_uso.md # Relevamiento funcional detallado (CU-01 a CU-08 y Contratos)
-│   └── arquitectura_y_diseno_oo.md   # Explicación de arquitectura en 3 capas, Singleton y Secuencia
-└── README.md                         # Memoria técnica principal del proyecto
+│   ├── especificacion_casos_de_uso.md # Relevamiento detallado de casos de uso (CU-01 al CU-08) y contratos
+│   └── arquitectura_y_diseno_oo.md   # Explicación de la arquitectura en 3 capas, Singleton y secuencia
+└── README.md                         # Este documento
 ```
 
 ---
 
-## 🚀 7. Instrucciones de Despliegue y Puesta en Marcha
+## Cómo Probar el Proyecto Localmente
 
-1. **Clonar el repositorio:**
+1. **Clonar este repositorio:**
    ```bash
    git clone https://github.com/SabriiAC/gestion_club_deportivo.git
    cd gestion_club_deportivo
    ```
-2. **Crear e inicializar la Base de Datos:**
-   * Abrir MySQL Workbench o terminal:
+2. **Crear la base de datos en MySQL:**
+   * Abrí MySQL Workbench o una terminal de MySQL y ejecutá:
    ```sql
    source database/schema.sql;
    ```
-3. **Configurar la cadena de conexión:**
-   * Abrir la solución en **Visual Studio 2022**.
-   * En `Conectividad.cs`, verificar los parámetros de conexión:
+3. **Configurar la conexión en Visual Studio:**
+   * Abrí la solución en Visual Studio 2022.
+   * En `Conectividad.cs`, ajustá los datos de tu servidor local:
    ```csharp
    private string cadenaConexion = "Server=localhost;Database=club_deportivo_db;Uid=root;Pwd=tu_password;";
    ```
-4. **Compilar y Ejecutar:** Presionar `F5` para iniciar el entorno en modo debug.
+4. **Ejecutar:** Compilá la solución y presiona F5 para correr la aplicación.
 
 ---
 
-## 👩‍💻 Sobre la Autora
-**Sabrina Belén Mamaniz**  
-*Estudiante avanzada de la Tecnicatura Superior en Desarrollo de Software (IFTS N° 29, CABA).*  
-*Certificada en Google Data Analytics.*  
-*Locutora Nacional (UNLaM).*  
+## Sobre Mí
+Soy **Sabrina Belén Mamaniz**, estudiante avanzada de la Tecnicatura Superior en Desarrollo de Software en el IFTS N° 29 (CABA), certificada en Google Data Analytics y Locutora Nacional egresada de la UNLaM.
 
-* 💼 LinkedIn: [linkedin.com/in/sabrina-mamaniz](https://www.linkedin.com/in/sabrina-mamaniz/)  
-* 🐙 GitHub: [github.com/SabriiAC](https://github.com/SabriiAC)  
-* 📧 Correo: [sabrinamamaniz00@gmail.com](mailto:sabrinamamaniz00@gmail.com)
+* LinkedIn: [linkedin.com/in/sabrina-mamaniz](https://www.linkedin.com/in/sabrina-mamaniz/)
+* GitHub: [github.com/SabriiAC](https://github.com/SabriiAC)
+* Correo: [sabrinamamaniz00@gmail.com](mailto:sabrinamamaniz00@gmail.com)
