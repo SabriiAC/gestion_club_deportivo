@@ -355,31 +355,4 @@ El script SQL completo para recrear las tablas y cargar datos de prueba está en
 
 ---
 
-## Cómo Probar el Proyecto Localmente
 
-1. **Clonar este repositorio:**
-   ```bash
-   git clone https://github.com/SabriiAC/gestion_club_deportivo.git
-   cd gestion_club_deportivo
-   ```
-2. **Crear la base de datos en MySQL:**
-   * Abrí MySQL Workbench o una terminal de MySQL y ejecutá:
-   ```sql
-   source database/schema.sql;
-   ```
-3. **Configurar la conexión en Visual Studio:**
-   * Abrí la solución en Visual Studio 2022.
-   * En `Conectividad.cs`, ajustá los datos de tu servidor local:
-   ```csharp
-   private string cadenaConexion = "Server=localhost;Database=club_deportivo_db;Uid=root;Pwd=tu_password;";
-   ```
-4. **Ejecutar:** Compilá la solución y presiona F5 para correr la aplicación.
-
----
-
-## Sobre Mí
-Soy **Sabrina Belén Mamaniz**, estudiante avanzada de la Tecnicatura Superior en Desarrollo de Software en el IFTS N° 29 (CABA), certificada en Google Data Analytics y Locutora Nacional egresada de la UNLaM.
-
-* LinkedIn: [linkedin.com/in/sabrina-mamaniz](https://www.linkedin.com/in/sabrina-mamaniz/)
-* GitHub: [github.com/SabriiAC](https://github.com/SabriiAC)
-* Correo: [sabrinamamaniz00@gmail.com](mailto:sabrinamamaniz00@gmail.com)
