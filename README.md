@@ -1,6 +1,6 @@
 # Sistema de Gestión para Club Deportivo (CLUB67)
 > Trabajo Integrador de Modelado de Software y Arquitectura en 3 Capas (.NET C# y MySQL)  
-> Desarrollado por **Sabrina Belén Mamaniz** para la Tecnicatura Superior en Desarrollo de Software (IFTS N° 29, CABA).
+
 
 [![Tecnología](https://img.shields.io/badge/.NET-C%23-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![Base de Datos](https://img.shields.io/badge/MySQL-8.0-orange?style=flat-square&logo=mysql)](https://www.mysql.com/)
