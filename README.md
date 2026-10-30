@@ -341,8 +341,8 @@ El script SQL completo para recrear las tablas y cargar datos de prueba está en
 
 ---
 
-## 📖 Manual de Usuario
+##  Manual de Usuario
 
-Para consultar el funcionamiento operativo de cada módulo de la aplicación con sus pantallas y flujos detallados:
+Podes ver el funcionamiento operativo de cada módulo de la aplicación con sus pantallas y flujos detallados:
 
 👉 **[Abrir Manual de Usuario (PDF)](MANUAL%20DE%20USUARIO.pdf)**
