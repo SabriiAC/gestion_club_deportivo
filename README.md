@@ -1,5 +1,5 @@
 # Sistema de Gestión para Club Deportivo (CLUB67)
-> Trabajo Integrador de Modelado de Software (.NET C# y MySQL)  
+> Trabajo Integrador de Modelado de Software y Desarrollo Orientado a Objetos (.NET C# y MySQL)  
 
 
 [![Tecnología](https://img.shields.io/badge/.NET-C%23-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
