@@ -1,0 +1,19 @@
+## .NET & Visual Studio
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## OS & Editors
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+
+releases/
+
