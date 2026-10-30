@@ -11,9 +11,9 @@
 
 ## Origen y Contexto del Proyecto
 
-Desarrollé este proyecto como Trabajo Práctico Integrador para las materias **Modelado y Diseño de Software** y **Taller de Programación** del IFTS N° 29. 
+Desarrollé este proyecto como Trabajo Práctico Integrador para las materias **Modelado y Diseño de Software** y **Desarrollo de Software Orientado a Objeto** del IFTS N° 29. 
 
-El objetivo era modelar e implementar el circuito operativo de un club deportivo barrial: administración de socios, cobro de aranceles, control de accesos por cuota al día, turnos de nutrición y registro del personal docente. 
+El objetivo era modelar e implementar el circuito operativo de un club deportivo barrial: administración de socios, cobro de aranceles, control de accesos por cuota al día, relevación de la consulta de nutrición y registro de ingreso del personal. 
 
 En vez de limitarme a una interfaz visual simple, encaré el proyecto desde la ingeniería de software: primero relevé los procesos y reglas del negocio, después modelé la solución con diagramas UML formales y finalmente construí la arquitectura en capas conectada a MySQL.
 
@@ -26,7 +26,7 @@ Cuando analicé el funcionamiento del club, identifiqué cinco reglas clave que 
 1. **Diferenciación entre Socios y No Socios:** Los socios pagan una cuota mensual recurrente que les permite acceder a las instalaciones. Los no socios solo abonan un pase diario para la actividad puntual que eligen en el día.
 2. **Cálculo de vencimientos a 30 días continuos:** Si un socio se atrasa y paga fuera de término, los 30 días no se cuentan desde el día del pago, sino a partir de la fecha de su vencimiento anterior. De esta manera, el club evita que un socio saltee períodos impagos.
 3. **Apto físico obligatorio:** Ningún cliente puede completar su registro ni participar en actividades sin presentar el certificado médico. En el sistema, la validación del apto bloquea el guardado si no está tildada la recepción del documento.
-4. **Carnet exclusivo para socios al día:** El carnet con identificador único solo se genera para socios con cuota vigente. Si el socio queda inhabilitado por mora, el sistema impide la emisión de duplicados hasta regularizar el pago.
+4. **Carnet exclusivo para socios al día:** El carnet con identificador único solo se genera para socios con cuota vigente. 
 5. **Financiación con tarjeta:** El cobro en 3 o 6 cuotas se restringe únicamente al medio de pago tarjeta de crédito.
 
 ---
@@ -46,41 +46,9 @@ Organicé el código en tres capas separadas para que cada componente tenga una 
 ### Casos de Uso
 El siguiente diagrama resume los límites del sistema, los actores que intervienen y las relaciones entre operaciones:
 
-```mermaid
-flowchart LR
-    subgraph Actores
-        Admin["Administrativo<br/>(Actor Principal)"]
-        Socio["Socio"]
-        NoSocio["No Socio"]
-        Prof["Profesor"]
-        Med["Médico / Nutricionista"]
-    end
+<img width="1307" height="659" alt="image" src="https://github.com/user-attachments/assets/8c34ed47-4401-4428-8c5d-26a5d5cbc507" />
 
-    subgraph Sistema ["Sistema de Gestión Club Deportivo"]
-        CU01(["Inscripción al Club"])
-        CU02(["Registrar Pago Mensual"])
-        CU03(["Emitir Carnet"])
-        CU04(["Seleccionar Actividad"])
-        CU05(["Registrar Pago Actividad"])
-        CU06(["Consultar Vencimientos"])
-        CU07(["Actualizar Ficha Médica"])
-        CU08(["Registrar Asistencia Docente"])
-    end
 
-    Admin --> CU01
-    Admin --> CU02
-    Admin --> CU05
-    Admin --> CU06
-    
-    CU01 -.->|"<<include>>"| CU02
-    CU01 -.->|"<<extend>>"| CU03
-    
-    Socio --> CU04
-    NoSocio --> CU04
-    
-    Prof --> CU08
-    Med --> CU07
-```
 
 ---
 
@@ -215,29 +183,43 @@ Proceso dividido en carriles para delimitar responsabilidades entre el cliente, 
 
 ```mermaid
 flowchart TD
-    subgraph Cliente
-        A1([Inicio]) --> A2[Presenta DNI y certificado médico]
+    subgraph Admin ["Carril: Administrativo (Operador UI)"]
+        A1([Inicio]) --> A2[Abre formulario de inscripción]
+        A2 --> A3[Ingresa DNI del cliente]
+        
+        A4[Visualiza alerta: 'DNI ya registrado'] --> A4_1{¿Desea corregir DNI?}
+        A4_1 -- Sí: Error de tipeo --> A3
+        A4_1 -- No: Cliente ya registrado --> A8([Fin: Trámite cancelado])
+        
+        A5[Completa datos personales y tilda Apto Físico] --> A6[Presiona botón 'Guardar']
+        
+        A7[Visualiza bloqueo: Certificado médico obligatorio] --> A8
+        
+        A9{¿Desea emitir carnet ahora?} -- Sí --> A10[Presiona 'Sí: Emitir carnet']
+        A9 -- No --> A11[Presiona 'No: Omite emisión inmediata']
+        
+        A13[Recibe carnet impreso y lo entrega al socio] --> A12([Fin: Inscripción Exitosa])
+        A11 --> A12
     end
 
-    subgraph Administrativo
-        A2 --> B1[Abre formulario de registro]
-        B1 --> B2[Ingresa datos personales y de contacto]
-        B4{¿DNI ya registrado?} -- Sí --> B5[Informa error y solicita verificar datos]
-        B5 --> B2
-        B4 -- No --> B6{¿Tipo de cliente?}
-        B6 -- Socio --> B7[Registra cobro de primera mensualidad]
-        B6 -- No Socio --> B8[Registra cliente eventual]
-        B7 --> B9[Entrega carnet impreso]
-        B9 --> B10([Fin del trámite])
-        B8 --> B10
-    end
+    subgraph Sys ["Carril: Sistema (.NET WinForms & MySQL)"]
+        A3 --> S1[Consulta existencia de DNI en MySQL]
+        S1 --> S2{¿DNI ya registrado?}
+        
+        S2 -- Sí --> A4
+        S2 -- No: DNI disponible --> A5
+        
+        A6 --> S3{¿Apto físico tildado?}
+        S3 -- No --> A7
+        S3 -- Sí --> S4[Inserta nuevo registro en tabla Clientes]
+        
+        S4 --> S5{¿Tipo de cliente?}
+        S5 -- Socio --> A9
+        S5 -- No Socio --> S6[Habilita registro para compras eventuales]
+        S6 --> A12
 
-    subgraph Sistema
-        B2 --> C1[Consulta tabla clientes en MySQL]
-        C1 --> B4
-        B7 --> C2[Inserta pago y calcula vencimiento a 30 días]
-        C2 --> C3[Genera número de carnet único]
-        C3 --> B9
+        A10 --> S7[Genera identificador único y envía reporte a impresora]
+        S7 --> A13
     end
 ```
 
